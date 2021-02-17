@@ -1,14 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { KeyboardAvoidingView } from "react-native";
 import { StyleSheet, StatusBar } from "react-native";
 import { View, Text } from "react-native";
 import { Button, Input, Image } from "react-native-elements";
+import { auth } from "../firebase";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const signIn = () => {};
+  useEffect(() => {
+    const unsubsribe = auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        //push them to Home Page
+        navigation.replace("Home");
+      }
+    });
+    return unsubsribe;
+  }, []);
+
+  const signIn = () => {
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .catch((error) => alert(error));
+  };
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <StatusBar style="light"></StatusBar>
@@ -31,7 +46,7 @@ const LoginScreen = ({ navigation }) => {
 
         <Input
           placeholder="Password"
-          secureTextEntryw
+          secureTextEntry
           value={password}
           onChangeText={(text) => setPassword(text)}
         />
